@@ -9,4 +9,5 @@ University of Naples Parthenope
 ## Contact
 - GitHub: https://github.com/
 - Email: alessio.ferone@uniparthenope.it
+- Email: laura.inno@uniparthenope.it
 - Email: massimiliano.giordanoorsini001@studenti.uniparthenope.it
