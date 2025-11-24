@@ -1,5 +1,10 @@
-# Welcome to Project XYZ
-This is the official website for **Project XYZ**, a scientific research project focused on [brief description].
+# Atmospheric Retrieval of Exoplanets with Conditional Flow Matching
+
+The characterization of exoplanetary atmospheres allows a deeper understanding of planetary systems
+through atmospheric retrieval. Traditional sampling-based methods become impractical due to high
+computational cost, requiring several weeks to compute the full posterior distribution. We propose an
+atmospheric retrieval framework based on Continuous Normalizing Flows trained with Conditional Flow
+Matching, allowing for scalable training and inference, and a robust uncertainty quantification.
 
 ## 🔍 Abstract
 Project XYZ aims to [insert short abstract about the research goals and significance].
