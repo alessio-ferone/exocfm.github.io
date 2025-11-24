@@ -16,8 +16,8 @@ Matching, allowing for scalable training and inference, and a robust uncertainty
 
 ---
 ```
-### How to Cite
-If you use our work, please cite:
+[comment]: ### How to Cite
+[comment]: If you use our work, please cite:
 
-Author(s), "Project XYZ", Year, DOI: [insert DOI]
+[comment]: Author(s), "Project XYZ", Year, DOI: [insert DOI]
 ```
