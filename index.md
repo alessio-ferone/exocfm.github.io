@@ -1,6 +1,6 @@
 # Atmospheric Retrieval of Exoplanets with Conditional Flow Matching
 
-# Awarded Nvidia Academic Grant
+## Awarded Nvidia Academic Grant
 
 ## 🔍 Abstract
 The characterization of exoplanetary atmospheres allows a deeper understanding of planetary systems
