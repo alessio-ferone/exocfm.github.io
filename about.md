@@ -2,7 +2,7 @@
 We are members of the research team at the Computer Vision and Pattern Recognition Laboratory (CVPRLab) "Alfredo Petrosino", at Department of Science and Technology, Parthenope University of Naples.
 
 - Alessio Ferone (Principal Investigator)
-<img src="{{site.url}}/avatars/ferone.jpg" style="display: block; margin: auto;" />
+<img src="./avatars/ferone.jpg" style="display: block; margin: auto;" />
 Alessio Ferone has been Assistant Professor in Computer Science at University Parthenope of Naples since December 2008. He took a PhD in Computer Science at University of Milan in 2011. Since 2010 he teaches Image Analysis, Computer Vision in the M. Sc. and B. Sc. in Computer Science. He is the vice-head of Computer Vision and Pattern Recognition "Alfredo Petrosino" Laboratory, affiliated to CVPL, Italian Chapter of IAPR.
 He participated to many research projects, and he is coordinating the activities of the project "ESPLORA: Exoplanet Spectroscopy at high resolution to Probe their Lost Origins by Revealing their Atmospheric compositions".
 He is a senior IEEE member and CVPL (affiliated IAPR) member. He published about 40 papers on peer-reviewed journals and conference proceedings. The overall number of his citations in Google Scholar is 350 (H-index is 9).
