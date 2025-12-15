@@ -7,6 +7,8 @@ Alessio Ferone has been Assistant Professor in Computer Science at University Pa
 He participated to many research projects, and he is coordinating the activities of the project "ESPLORA: Exoplanet Spectroscopy at high resolution to Probe their Lost Origins by Revealing their Atmospheric compositions".
 He is a senior IEEE member and CVPL (affiliated IAPR) member. He published about 40 papers on peer-reviewed journals and conference proceedings. The overall number of his citations in Google Scholar is 350 (H-index is 9).
 
+
+
 - Massimiliano Giordano Orsini (Project Collaborator)
 <img src="./avatars/giordanoorsini.jpg" style="display: block; margin: auto;" />
 Massimiliano Giordano Orsini received the B.S. degree in Computer Science from the University of Naples Parthenope, in 2022, and the M.S. degree in Applied Computer Science (Machine Learning \& Big Data) from the University of Naples Parthenope, in 2024, where he is currently pursuing the Ph.D. degree in "Environment, Resources and Sustainable Development", with previous internship experience in research on the application of machine learning techniques for the removal of telluric spectra from spectroscopic observations. His current research interests include exoplanetary atmospheric retrieval, machine learning, deep generative modeling, and computer vision.
