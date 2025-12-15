@@ -6,11 +6,6 @@ Alessio Ferone has been Assistant Professor in Computer Science at University Pa
 He participated to many research projects, and he is coordinating the activities of the project "ESPLORA: Exoplanet Spectroscopy at high resolution to Probe their Lost Origins by Revealing their Atmospheric compositions". He is member of the editorial boards of the "International Journal of Computational Science and Engineering" and "International Journal on Semantic Web and Information Systems".
 He is a senior IEEE member and CVPL (affiliated IAPR) member. He published about 40 papers on peer-reviewed journals and conference proceedings. The overall number of his citations in Google Scholar is 350 (H-index is 9).
 
-- Stefano Fiscale (Project Collaborator)
-Stefano Fiscale is enrolled as Ph.D. student in the International PhD Programme / UNESCO Chair in "Environment, Resource and Sustainable Development" at Parthenope University of Naples, working in the Department of Science and Technology. Currently, he is involved in the development of Machine Learning (ML) algorithms to identify exoplanets in Kepler and TESS data. He is also the principal observer in different projects aimed at supporting the ESA's Comet Interceptor mission.
-He obtained his master's degree in Machine Learning and Big Data from Parthenope University of Naples, Italy, in 2022.
-As he is very keen in improving his communication skills (e.g. giving talks, effective writing), he attended several courses and schools mainly held by Nature Masterclasses
-
 - Massimiliano Giordano Orsini (Project Collaborator)
 Massimiliano Giordano Orsini received the B.S. degree in Computer Science from the University of Naples Parthenope, in 2022, and the M.S. degree in Applied Computer Science (Machine Learning \& Big Data) from the University of Naples Parthenope, in 2024, where he is currently pursuing the Ph.D. degree in "Environment, Resources and Sustainable Development", with previous internship experience in research on the application of machine learning techniques for the removal of telluric spectra from spectroscopic observations. His current research interests include exoplanetary atmospheric retrieval, machine learning, deep generative modeling, and computer vision.
 
@@ -18,5 +13,4 @@ Add Figure and descriptions
 
 ## Contact
 - Email: alessio.ferone@uniparthenope.it
-- Email: stefano.fiscale001@studenti.uniparthenope.it
 - Email: massimiliano.giordanoorsini001@studenti.uniparthenope.it
