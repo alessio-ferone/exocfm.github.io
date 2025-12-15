@@ -26,7 +26,7 @@ given observed spectra by solving the corresponding ODE formulation through mult
 characterization studies. Second, CNFs enables not only the generation of posterior samples but also the computation of the corresponding log-probabilities. Third, the flexibility of CNFs allows for seamless adaptation to different observational setups (e.g. low/high-resolution, ground/space-based instruments, etc.). To the same extent of traditional retrieval methods, CNFs could provide a robust uncertainty quantification. We plan to compute the full posterior distributions of atmospheric parameters using CNFs
 and to evaluate them in terms of calibration and uncertainty quantification, allowing a fair comparison between different statistical models. Our work will leverage NVIDIA’s GPU-accelerated libraries, such as CUDA and cuDNN, in Python programming language, and cloud-hosted NVIDIA’s hardware.
 
-<img src="./images/Picture2.png" style="display: block; margin: auto;" />
+<img src="./images/Picture2.jpg" style="display: block; margin: auto;" />
 
 ## Data
 In collaboration with the Italian National Institute of Astrophysics (INAF), we build a dedicated high-resolution dataset following the structure of the Ariel Data Challenge 2022 / 2023 datasets. In particular, the dataset comprises $91,392$ samples, each including three primary components:
