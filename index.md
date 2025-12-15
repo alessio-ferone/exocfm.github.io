@@ -11,7 +11,7 @@ computational cost, requiring several weeks to compute the full posterior distri
 atmospheric retrieval framework based on Continuous Normalizing Flows trained with Conditional Flow
 Matching, allowing for scalable training and inference, and a robust uncertainty quantification.
 
-Figura FlowChart articolo IEEEAccess
+<img src="./images/Picture1.png" style="display: block; margin: auto;" />
 
 
 ## 📚 Quick Links
