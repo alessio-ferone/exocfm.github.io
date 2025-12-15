@@ -1,6 +1,6 @@
 # Atmospheric Retrieval of Exoplanets with Conditional Flow Matching
 
-## Awarded Nvidia Academic Grant <a href="https://www.nvidia.com/en-us/industries/higher-education-research/academic-grant-program/">link</a>
+## <a href="https://www.nvidia.com/en-us/industries/higher-education-research/academic-grant-program/">Awarded Nvidia Academic Grant</a>
 Add Text of the CFP Data Science.
 
 
