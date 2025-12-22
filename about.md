@@ -13,3 +13,11 @@ He is a senior IEEE member and CVPL (affiliated IAPR) member. He published about
 ## Contact
 - Email: alessio.ferone@uniparthenope.it
 - Email: massimiliano.giordanoorsini001@studenti.uniparthenope.it
+
+
+## 📚 Quick Links
+- [Index](index.md)
+- [Publications](publications.md)
+- [Documentation](docs.md)
+
+---

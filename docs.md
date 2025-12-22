@@ -102,10 +102,13 @@ Due to the slow sampling speed of our simulator, PPCs cannot be performed in a r
 We perform a comparative analysis including our method, the FMPE baseline, and NPE. We plan to extend the comparison to traditional Bayesian inference methods, such as DE-MCMC [[15](@sherri2017differential)], on a very limited subset of the test set, due to their significant computational cost.
 
 Within this context, our experiments are driven by the following research questions:
+
 #### 1. Is FMPE Still the State-of-the-art in High-resolution Settings?
 > High-resolution spectra introduce both opportunities (more detailed molecular signatures) and challenges (larger input dimensions, higher noise sensitivity). While FMPE has demonstrated state-of-the-art results in medium-resolution settings [[11](@gebhard2024flowmatching-atmospheres), [12](@giordanoorsini2025flowmatching)], its scalability and reliability at high-resolution spectra need systematic evaluation, especially considering the dimensionality increase and computational complexity. 
+
 #### 2. Are Transformers Better Encoders for High-resolution Spectral Data?
 > High-resolution transmission spectra contain extremely long sequences (102,400 dimensions per spectrum). Traditional encoders in this context, such as Dense Residual Networks, may struggle with the high dimensionality of the spectra and long-range dependencies between spectral lines. Transformers are designed for sequence modeling and may simultaneously handle very high-dimensional spectra and capture the above-mentioned dependencies more effectively.
+
 #### 3. Are Auxiliary Data Beneficial in High-resolution Retrieval?
 > Auxiliary data (stellar and planetary parameters) provide contextual information that may complement the spectral input. We already proved their effectiveness in a prior work [[12](@giordanoorsini2025flowmatching)]. At high resolution, the potential of auxiliary data is still unknown.
 
@@ -266,8 +269,8 @@ In terms of posterior coverage, all metrics decrease with auxiliary data, which 
 
 | **Distribution Discrepancy Measure**                     | **MST-FMPE**  | **MST-FMPE w/ Aux. Data** |
 | ------------------------------ | ------------- | ------------------------- |
-| JSD                        | 210.66        | 208.42                    |
-| MMD                        | 0.060         | 0.053                     |
+| JSD                        | 210.66        | **208.42**                    |
+| MMD                        | 0.060         | **0.053**                     |
 
 In terms of distribution discrepancy measures, both metrics improve slightly with auxiliary data, indicating that the posterior distribution is closer to the reference, even though pointwise uncertainty and coverage are degraded.
 
@@ -367,3 +370,11 @@ Data used in these experiments are available on request.
 [25] <a id="henry2020query"></a> A. Henry, P. R. Dachapally, S. S. Pawar, and Y. Chen, "Query-Key Normalization for Transformers," in Findings of the Association for Computational Linguistics: EMNLP 2020, pp. 4246-4253, 2020.
 
 [26] <a id="shazeer2020glu"></a> N. Shazeer, "GLU Variants Improve Transformer," arXiv preprint arXiv:2002.05202, 2020.
+
+
+## 📚 Quick Links
+- [Index](index.md)
+- [Publications](publications.md)
+- [About Us](about.md)
+
+---
