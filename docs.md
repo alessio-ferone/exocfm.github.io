@@ -1,10 +1,10 @@
 # Project Documentation
 
 ## Introduction
-The characterization of exoplanetary atmospheres allows a deeper understanding of planetary formation, evolution, and habitability through atmospheric retrieval. The growing interest in these topics is confirmed by the expected launch in 2029 of the Atmospheric Remote-sensing Infrared Exoplanet Large-survey (ARIEL; [[2](@tinetti2018ariel)]) space mission by the European Space Agency, which will conduct a four-year large-scale spectral survey of transiting exoplanets at various levels of detail. Atmospheric retrieval refers to the fundamental process of inferring the chemical properties of the exoplanetary atmospheres [[3](@madhusudhan2018retrieval)]. During the last two decades, a plethora of exoplanet atmospheric retrieval codes have been developed, demonstrating the large interest in this research topic [[4](@macdonald2023catalog)]. Currently, the state-of-the-art atmospheric retrieval methods are based on Bayesian inference [[5](@skilling2006nested), [6](@feroz2009multinest), [7](@buchner2021ultranest)]. However, in certain cases these methods require several weeks to produce a full posterior distribution of atmospheric parameters given observed spectra. With the expected volume of incoming observations, traditional methods become simply impractical. Furthermore, the scalability requirement for atmospheric retrieval methods is supported by the need of high-resolution spectroscopic observations for accurate retrievals. Thanks to the increased sensitivity of high-resolution instruments, spectral bands can be decomposed into a dense forest of individual spectral lines, enabling precise molecular identification at the cost of significant computational burden [[8](@birkby2018spectroscopic)]. To address these challenges, we propose a novel atmospheric retrieval framework based on Continuous Normalizing Flows (CNFs; [[9](@chen2018neuralode)]) trained via Optimal-Transport Conditional Flow Matching (OT-CFM; [[10](@lipman2023flowmatching)]) to compute the joint posterior distribution of atmospheric parameters in a similar fashion to [[11](@gebhard2024flowmatching-atmospheres)].
+The characterization of exoplanetary atmospheres allows a deeper understanding of planetary formation, evolution, and habitability through atmospheric retrieval. The growing interest in these topics is confirmed by the expected launch in 2029 of the Atmospheric Remote-sensing Infrared Exoplanet Large-survey (ARIEL; [[2](#tinetti2018ariel)]) space mission by the European Space Agency, which will conduct a four-year large-scale spectral survey of transiting exoplanets at various levels of detail. Atmospheric retrieval refers to the fundamental process of inferring the chemical properties of the exoplanetary atmospheres [[3](#madhusudhan2018retrieval)]. During the last two decades, a plethora of exoplanet atmospheric retrieval codes have been developed, demonstrating the large interest in this research topic [[4](#macdonald2023catalog)]. Currently, the state-of-the-art atmospheric retrieval methods are based on Bayesian inference [[5](#skilling2006nested), [6](#feroz2009multinest), [7](#buchner2021ultranest)]. However, in certain cases these methods require several weeks to produce a full posterior distribution of atmospheric parameters given observed spectra. With the expected volume of incoming observations, traditional methods become simply impractical. Furthermore, the scalability requirement for atmospheric retrieval methods is supported by the need of high-resolution spectroscopic observations for accurate retrievals. Thanks to the increased sensitivity of high-resolution instruments, spectral bands can be decomposed into a dense forest of individual spectral lines, enabling precise molecular identification at the cost of significant computational burden [[8](#birkby2018spectroscopic)]. To address these challenges, we propose a novel atmospheric retrieval framework based on Continuous Normalizing Flows (CNFs; [[9](#chen2018neuralode)]) trained via Optimal-Transport Conditional Flow Matching (OT-CFM; [[10](#lipman2023flowmatching)]) to compute the joint posterior distribution of atmospheric parameters in a similar fashion to [[11](#gebhard2024flowmatching-atmospheres)].
 
 ## Methods
-CNFs [[9](@chen2018neuralode)] are a class of deep generative models that learn the probability flow from simple, easy-to-sample distributions to complex, high-dimensional probability distributions. Recently, OT-CFM [[10](@lipman2023flowmatching)] has been introduced as a simulation-free training paradigm based on regressing vector fields of fixed conditional probability paths, enabling for scalable training and sampling. 
+CNFs [[9](#chen2018neuralode)] are a class of deep generative models that learn the probability flow from simple, easy-to-sample distributions to complex, high-dimensional probability distributions. Recently, OT-CFM [[10](#lipman2023flowmatching)] has been introduced as a simulation-free training paradigm based on regressing vector fields of fixed conditional probability paths, enabling for scalable training and sampling. 
 
 Unlike conventional neural networks that produce point estimates, CNFs can approximate the full posterior distribution of atmospheric parameters given observed spectra by solving the corresponding ODE formulation through multiple neural function evaluations (NFEs). 
 
@@ -20,13 +20,13 @@ We plan to compute the full posterior distributions of atmospheric parameters us
 <!-- <img src="./images/Picture2.jpg" style="display: block; margin: auto;" /> !-->
 
 ## Overview of the FMPE framework
-The FMPE-based retrieval framework is built upon Conditional Flow Matching (CFM; [[10]](@lipman2023flowmatching)), a simulation-free training paradigm of CNFs based on the definition of an Ordinary Differential Equation (ODE), in which we regress onto a target conditional vector field that generates a desired conditional probability path. In this way, we are able to transport samples from an easy-to-sample base distribution (e.g., a standard normal) to the desired data distribution.
+The FMPE-based retrieval framework is built upon Conditional Flow Matching (CFM; [[10](#lipman2023flowmatching)]), a simulation-free training paradigm of CNFs based on the definition of an Ordinary Differential Equation (ODE), in which we regress onto a target conditional vector field that generates a desired conditional probability path. In this way, we are able to transport samples from an easy-to-sample base distribution (e.g., a standard normal) to the desired data distribution.
 Here, we consider the simplest conditional path that is given by the CondOT (or equivalently OT-CFM), based on the optimal transport theory which couples samples between the base and data distributions using a linear interpolation, thus easily providing a closed-form solution of the target conditional vector field.  
-FMPE enables the application of CNFs trained with CFM to simulation-based inference (and hence, atmospheric retrieval) just using the Bayes' theorem (see [[11](@gebhard2024flowmatching-atmospheres), [12](@giordanoorsini2025flowmatching)] for additional details).
+FMPE enables the application of CNFs trained with CFM to simulation-based inference (and hence, atmospheric retrieval) just using the Bayes' theorem (see [[11](#gebhard2024flowmatching-atmospheres), [12](#giordanoorsini2025flowmatching)] for additional details).
 
-The training of CNFs with the FMPE paradigm is driven by the minimization of the FMPE loss (see Equation 7 in [[27](@wildberger2023flowmatching)]).
+The training of CNFs with the FMPE paradigm is driven by the minimization of the FMPE loss (see Equation 7 in [[27](#wildberger2023flowmatching)]).
 
-To infer the posterior distribution of atmospheric parameters, we solve the underlying ODE governing the trasport dynamics in the case of FMPE through multiple NFEs of the trained CNF (see Equation 2 in [[27](@wildberger2023flowmatching)]).
+To infer the posterior distribution of atmospheric parameters, we solve the underlying ODE governing the trasport dynamics in the case of FMPE through multiple NFEs of the trained CNF (see Equation 2 in [[27](#wildberger2023flowmatching)]).
 
 ### Implementation of the FMPE-based retrieval framework
 
@@ -50,16 +50,15 @@ In the following sections, we will describe the architecture of the two neural n
 
 #### Dense Residual Network
 
-A Dense Residual Network is composed of a sequence of dense residual blocks, each including Layer Normalization [[16](@ba2016layernorm)], GELU activation function [[17](@hendrycks2016gelu)], and dropout regularization [[18](@srivastava2014dropout)]. Here we provide a visual illustration of the Dense Residual Network implementing a CNF, where larger rectangles indicates larger number of parameters. 
+A Dense Residual Network is composed of a sequence of dense residual blocks, each including Layer Normalization [[16](#ba2016layernorm)], GELU activation function [[17](#hendrycks2016gelu)], and dropout regularization [[18](#srivastava2014dropout)]. Here we provide a visual illustration of the Dense Residual Network implementing a CNF, where larger rectangles indicates larger number of parameters. 
 
-
-![Overview of a Dense Residual Network](./images/dense_residual_block.png)
+<div style="text-align:center"><img src="./images/dense_residual_block.png" alt="Overview of a Dense Residual Network."/></div>
 
 The first dense residual block processes the embeddings of the spectral context, of auxiliary data, of timestep and atmospheric parameters, jointly, while the last block outputs the predicted vector field.
 
 In this case, the feature extraction process is mainly driven by the embedding of the spectral context, where most of the computation happens, while the rest of the embeddings are used as conditioning information. For this aim, linear layers are used to match embedding dimensions. 
-To condition the embedding of the spectral context, GLUs [[22](@dauphin2017gatedconv)] on the spectral context are employed. 
-In contrast to our prior work [[12](@giordanoorsini2025flowmatching)], we introduce two GLUs: the former acts on the auxiliary data, while the latter on the timestep-atmospheric parameters pair.
+To condition the embedding of the spectral context, GLUs [[22](#dauphin2017gatedconv)] on the spectral context are employed. 
+In contrast to our prior work [[12](#giordanoorsini2025flowmatching)], we introduce two GLUs: the former acts on the auxiliary data, while the latter on the timestep-atmospheric parameters pair.
 
 The residual (or skip) connection mitigate vanishing gradients in deeper configurations, enabling scalable and expressive transformations for density estimation. The intermediate output of each block is then passed as input to the next block of the dense residual network until the predicted vector field is obtained.
 
@@ -72,14 +71,14 @@ At each scale, patches are linearly projected into a shared embedding space, pro
 
 * **Token and Positional Encoding.** We point that the wavelengths naturally encode the positional information of each token and patch. Therefore, we exploit this by simply adding the wavelengths to each token and by adopting a wavelength-based patch-level positional encoding. 
 
-* **Transformer Blocks.** At each scale, the embedded tokens are processed by a stack of Transformer layers [[23](@vaswani2017attention)], which can be repeated for each scale. Each layer follows a pre-normalization and post-normalization scheme using RMS normalization [[24](@zhang2019rmsnorm)], improving numerical stability and training robustness. Self-attention is implemented via multi-head self-attention (MHSA), using a classic attention formulation. Query–key normalization [[25](@henry2020query)] is applied to stabilize attention scores. The feed-forward network (FFN) within each Transformer block adopts a SwiGLU activation [[26](@shazeer2020glu)] and dropout regularization [[18](@srivastava2014dropout)] to mitigate overfitting.
+* **Transformer Blocks.** At each scale, the embedded tokens are processed by a stack of Transformer layers [[23](#vaswani2017attention)], which can be repeated for each scale. Each layer follows a pre-normalization and post-normalization scheme using RMS normalization [[24](#zhang2019rmsnorm)], improving numerical stability and training robustness. Self-attention is implemented via multi-head self-attention (MHSA), using a classic attention formulation. Query–key normalization [[25](#henry2020query)] is applied to stabilize attention scores. The feed-forward network (FFN) within each Transformer block adopts a SwiGLU activation [[26](#shazeer2020glu)] and dropout regularization [[18](#srivastava2014dropout)] to mitigate overfitting.
 
 * **Cross-Scale Fusion.** To integrate information across resolutions, the architecture employs incremental cross-attention between scales. Representations at finer scales attend to coarser-scale representations through multi-head cross-attention (MHCA), allowing local features to be contextualized by global structure. This progressive fusion strategy ensures that information flows coherently across scales while mantaining a compact latent representation.
 
 
 An overview of the Multi-Scale Transformer is presented in the following figure.
 
-![Overview of the Multi-Scale Transformer Embedding Network.](./images/multi_scale_transformer.png)
+<div style="text-align:center"><img src="./images/multi_scale_transformer.png" alt="Overview of the Multi-Scale Transformer Embedding Network."/></div>
 
 ### Multi-Scale Transformer-FMPE (MST-FMPE)
 
@@ -94,7 +93,7 @@ Cross-scale fusion is done by using MHCA with 4 heads.
 
 A simple, schematic overview of the MST-FMPE framework is presented in the following figure.
 
-![Overview of the MST-FMPE framework.](./images/MST_FMPE_diagram.png)
+<div style="text-align:center"><img src="./images/MST_FMPE_diagram.png" alt="Overview of the MST-FMPE framework."/></div>
 
 ## Experimental Setup
 
@@ -102,20 +101,20 @@ A simple, schematic overview of the MST-FMPE framework is presented in the follo
 Within this context, our experiments are driven by the following research questions:
 
 #### 1. Is FMPE Still the State-of-the-art in High-resolution Settings?
-> High-resolution spectra introduce both opportunities (more detailed molecular signatures) and challenges (larger input dimensions, higher noise sensitivity). While FMPE has demonstrated state-of-the-art results in medium-resolution settings [[11](@gebhard2024flowmatching-atmospheres), [12](@giordanoorsini2025flowmatching)], its scalability and reliability at high-resolution spectra need systematic evaluation, especially considering the dimensionality increase and computational complexity. 
+> High-resolution spectra introduce both opportunities (more detailed molecular signatures) and challenges (larger input dimensions, higher noise sensitivity). While FMPE has demonstrated state-of-the-art results in medium-resolution settings [[11](#gebhard2024flowmatching-atmospheres), [12](#giordanoorsini2025flowmatching)], its scalability and reliability at high-resolution spectra need systematic evaluation, especially considering the dimensionality increase and computational complexity. 
 
 #### 2. Are Transformers Better Encoders for High-resolution Spectral Data?
 > High-resolution transmission spectra contain extremely long sequences (102,400 dimensions per spectrum). Traditional encoders in this context, such as Dense Residual Networks, may struggle with the high dimensionality of the spectra and long-range dependencies between spectral lines. Transformers are designed for sequence modeling and may simultaneously handle very high-dimensional spectra and capture the above-mentioned dependencies more effectively.
 
 #### 3. Are Auxiliary Data Beneficial in High-resolution Retrieval?
-> Auxiliary data (stellar and planetary parameters) provide contextual information that may complement the spectral input. We already proved their effectiveness in a prior work [[12](@giordanoorsini2025flowmatching)]. At high resolution, the potential of auxiliary data is still unknown.
+> Auxiliary data (stellar and planetary parameters) provide contextual information that may complement the spectral input. We already proved their effectiveness in a prior work [[12](#giordanoorsini2025flowmatching)]. At high resolution, the potential of auxiliary data is still unknown.
 
 The following sections will describe the dataset, training and inference procedures, the posterior evaluation framework, and the neural competitors involved in the comparative analysis.
 
 ### Dataset 
 <a href="dataset">
 
-In collaboration with the [Italian National Institute of Astrophysics (INAF)](http://www.inaf.it/en), we build a dedicated high-resolution dataset following the structure of the Ariel Data Challenge 2022 / 2023 datasets [[1](@changeat2023esa-ariel)]. In particular, the dataset comprises 91,392 samples, each including three primary components:
+In collaboration with the [Italian National Institute of Astrophysics (INAF)](http://www.inaf.it/en), we build a dedicated high-resolution dataset following the structure of the Ariel Data Challenge 2022 / 2023 datasets [[1](#changeat2023esa-ariel)]. In particular, the dataset comprises 91,392 samples, each including three primary components:
 
 * **Spectral data**, comprising of a 102,400-dimensional atmospheric spectrum, providing information on transit depth and covering the spectral range from 0.9 μm to 2.42 μm and associated measurement uncertainty.
 
@@ -153,33 +152,33 @@ Also in this case, we enable automatic mixed precision to save memory during for
 
 
 ###  Evaluation
-To assess the performance of heterogeneous posterior estimators, we established an extensive evaluation framework, including regression errors, uncertainty estimation and calibration, posterior coverage, and distribution discrepancy measures, thus following our prior work on low-resolution trasmission spectroscopy [[12](@giordanoorsini2025flowmatching)].
+To assess the performance of heterogeneous posterior estimators, we established an extensive evaluation framework, including regression errors, uncertainty estimation and calibration, posterior coverage, and distribution discrepancy measures, thus following our prior work on low-resolution trasmission spectroscopy [[12](#giordanoorsini2025flowmatching)].
 
-We recall that all of these predictive aspects provide precious information about the quality of the predicted posterior distributions but to check whether the inference is correct, the analysis should be complemented with posterior predictive checks (PPCs; [[13](@cook2006validation), [14](@gelman2013bayesian)]). These checks involve the comparison between the distribution of the original simulated observations with the posterior predictive distribution obtained by passing the set of posterior samples as input to the simulator. 
+We recall that all of these predictive aspects provide precious information about the quality of the predicted posterior distributions but to check whether the inference is correct, the analysis should be complemented with posterior predictive checks (PPCs; [[13](#cook2006validation), [14](#gelman2013bayesian)]). These checks involve the comparison between the distribution of the original simulated observations with the posterior predictive distribution obtained by passing the set of posterior samples as input to the simulator. 
 Due to the slow sampling speed of our simulator, PPCs cannot be performed in a reasonable amount of time, even considering the modest size of the designed test set.
 
 
 ### Competitors
 
 We perform a comparative analysis including: (i) our FMPE-based retrieval framework leveraging the Multi-Scale Transformer as context embedding entwork (denoted with MST-FMPE); (ii) the FMPE baseline, which uses Dense Residual Networks to parameterize each module; (iii) Neural Posterior Estimation (NPE), which has been the state of the art before FMPE. 
-We plan to extend the comparison to traditional Bayesian inference methods, such as DE-MCMC [[15](@sherri2017differential)], on a very limited subset of the test set, due to their significant computational cost.
+We plan to extend the comparison to traditional Bayesian inference methods, such as DE-MCMC [[15](#sherri2017differential)], on a very limited subset of the test set, due to their significant computational cost.
 
 #### FMPE Model
 The FMPE model uses the same configuration to parameterize the Context Embedding Network and the Timestep and Atmospheric Parameters Embedding Network, that consists of a shallow Dense Residual Network, with just 2 blocks, each producing an hidden representation of size 512. In all cases, dropout regularization is set to 0.1.
 
 A schematic overview of the baseline FMPE framework is presented in the following figure.
 
-![Overview of the FMPE framework.](./images/FMPE_diagram.png) 
+<div style="text-align:center"><img src="./images/FMPE_diagram.png" alt="Overview of the FMPE framework."/></div>
 
 
 #### NPE Model
-NPE involves the training of a conditional density estimator which describes the transformation of a probability density (e.g., a standard normal) through a sequence of invertible mappings. Following the implementation provided by the authors in [[11](@gebhard2024flowmatching-atmospheres)], the NPE model consists of two parts: (i) a **Context Embedding Network**, parameterized by a shallow Dense Residual Network, identical to the context embedding network of the baseline FMPE model; and (ii) a **Discrete Normalizing Flow**. We use a neural spline flow (NSF; [[19](@durkan2019neuralsplineflows)]) as implemented by the ```glasflow``` library [[20](@williams2024glasflow)], which is itself based on ```nflows``` [[21](@durkan2020nflows)]. The conditional NSF takes the embedded context as input and consists of 16 steps, each consisting of 4 blocks with 512 units, GELU activation functions [[17](@hendrycks2016gelu)], and dropout regularization [[18](@srivastava2014dropout)] set to 0.1. The number of bins for the splines is 16.
+NPE involves the training of a conditional density estimator which describes the transformation of a probability density (e.g., a standard normal) through a sequence of invertible mappings. Following the implementation provided by the authors in [[11](#gebhard2024flowmatching-atmospheres)], the NPE model consists of two parts: (i) a **Context Embedding Network**, parameterized by a shallow Dense Residual Network, identical to the context embedding network of the baseline FMPE model; and (ii) a **Discrete Normalizing Flow**. We use a neural spline flow (NSF; [[19](#durkan2019neuralsplineflows)]) as implemented by the ```glasflow``` library [[20](#williams2024glasflow)], which is itself based on ```nflows``` [[21](#durkan2020nflows)]. The conditional NSF takes the embedded context as input and consists of 16 steps, each consisting of 4 blocks with 512 units, GELU activation functions [[17](#hendrycks2016gelu)], and dropout regularization [[18](#srivastava2014dropout)] set to 0.1. The number of bins for the splines is 16.
 This configuration is designed to match approximatively the number of parameters of the FMPE-based model. 
 The NPE models is trained using maximum likelihood estimation (MLE), as Discrete Normalizing Flows are able to compute directly the likelihood of the samples using the change-of-variable formula.
 
 A visual illustration of the NPE framework is presented in the following figure.
 
-![Overview of the NPE framework.](./images/NPE_diagram.png)
+<div style="text-align:center"><img src="./images/NPE_diagram.png" alt="Overview of the NPE framework."/></div>
 
 
 ## Results and Discussion
