@@ -331,7 +331,7 @@ In terms of distribution discrepancy measures, both metrics improve slightly wit
 ### Challenges of FMPE-based Retrieval Frameworks in High-Resolution Settings
 A central practical limitation in this study stems from the numerical ODE integration during sampling with CNFs. While adaptive solvers such as ```dopri5``` are commonly used in CNF-based models, their computational cost scales rapidly with NFEs, rendering them prohibitive in high-dimensional settings. As a result, we can rely either on relaxed absolute and relative tolerances for adaptive solvers or on fixed-step solvers (e.g., ```rk4```) with a small number of integration steps. Here we adopt the second option. 
 Nevertheless, both choices introduce approximation errors in the trasport dynamics, potentially hindering performance of FMPE-based retrieval frameworks, and specifically, of the proposed contribution.
-Recent approaches aim at straightening the flow or avoiding explicit ODE simulation—such as rectified flows, high-order flow matching, or flow map matching—represent promising directions to alleviate this limitation and may be necessary to fully exploit richer context embeddings.
+Recent approaches aim at straightening the flow [[28](#wang2024rectified), [29](#yang2024consistency), [30](#sabour2025alignflow), [31](#kim2025simplereflow)], introducing high-order velocity parameterization [[32](#su2025highorder), [33](#zhang2025hierarchical), [34](#guo2025variational)], or avoiding explicit ODE simulation [[35](#boffi2024flowmap)], to alleviate this limitation and may be necessary to fully exploit richer context embeddings.
 
 
 ## Summary
@@ -364,33 +364,23 @@ Data used in these experiments are available on request.
 
 [1] <a id="changeat2023esa-ariel"></a> Q. Changeat and K. H. Yip, "ESA-Ariel Data Challenge NeurIPS 2022: introduction to exo-atmospheric studies and presentation of the Atmospheric Big Challenge (ABC) Database," *RAS Techniques and Instruments*, vol. 2, no. 1, pp. 45–61, 2023.
 
-
 [2] <a id="tinetti2018ariel"></a> G. Tinetti, P. Drossart, P. Eccleston et al., "A chemical survey of exoplanets with ARIEL," *Experimental Astronomy*, vol. 46, pp. 135–209, 2018. 
-
 
 [3] <a id="madhusudhan2018retrieval"></a> N. Madhusudhan, "Atmospheric Retrieval of Exoplanets," in *Handbook of Exoplanets*, Springer, Cham, 2018, pp. 2153–2182. 
 
-
 [4] <a id="macdonald2023catalog"></a> R. J. MacDonald and N. E. Batalha, "A Catalog of Exoplanet Atmospheric Retrieval Codes," *Research Notes of the AAS*, vol. 7, no. 3, 2023. 
-
 
 [5] <a id="skilling2006nested"></a> J. Skilling, "Nested sampling for general Bayesian computation," *Bayesian Analysis*, vol. 1, no. 4, pp. 833–859, 2006.
 
-
 [6] <a id="feroz2009multinest"></a> F. Feroz, M. P. Hobson, and M. Bridges, "MultiNest: an efficient and robust Bayesian inference tool for cosmology and particle physics," *Monthly Notices of the Royal Astronomical Society*, vol. 398, no. 4, pp. 1901–1914, 2009.
-
 
 [7] <a id="buchner2021ultranest"></a> J. Buchner, "UltraNest: a robust, general purpose Bayesian inference engine," *Journal of Open Source Software*, vol. 6, no. 60, p. 3001, 2021. 
 
-
 [8] <a id="birkby2018spectroscopic"></a> J. L. Birkby, "Spectroscopic Direct Detection of Exoplanets," in *Handbook of Exoplanets*, Springer, Cham, 2018, pp. 1485–1508.
-
 
 [9] <a id="chen2018neuralode"></a> R. T. Q. Chen, Y. Rubanova, J. Bettencourt, and D. Duvenaud, "Neural Ordinary Differential Equations," in *Advances in Neural Information Processing Systems 31 (NeurIPS 2018)*.
 
-
 [10] <a id="lipman2023flowmatching"></a> Y. Lipman, R. T. Q. Chen, H. Ben-Hamu, M. Nickel, and M. Le, "Flow Matching for Generative Modeling," *arXiv preprint* arXiv:2210.02747, 2023. 
-
 
 [11] <a id="gebhard2024flowmatching-atmospheres"></a> T. D. Gebhard, J. Wildberger, S. P. Quanz, M. Dax, A. Kofler, D. Angerhausen, and B. Schölkopf, "Flow Matching for Atmospheric Retrieval of Exoplanets," *Astronomy & Astrophysics*, vol. 693, A42, 2024. 
 
@@ -410,21 +400,42 @@ Data used in these experiments are available on request.
 
 [19] <a id="durkan2019neuralsplineflows"></a> C. Durkan, A. Bekasov, I. Murray, and G. Papamakarios, "Neural Spline Flows," in *Advances in Neural Information Processing Systems 32 (NeurIPS 2019)*, Curran Associates, Inc., 2019.
 
-[20] <a id="williams2024glasflow"></a> M. J. Williams, jmcginn, federicostak, and J. Veitch, "uofgravity/glasflow: v0.4.1," Zenodo, version v0.4.1, 2024. DOI: 10.5281/zenodo.13914483.
+[20] <a id="williams2024glasflow"></a> M. J. Williams, jmcginn, federicostak, and J. Veitch, "uofgravity/glasflow: v0.4.1," *Zenodo*, version v0.4.1, 2024. DOI: 10.5281/zenodo.13914483.
 
-[21] <a id="durkan2020nflows"></a> C. Durkan, A. Bekasov, I. Murray, and G. Papamakarios, "nflows: normalizing flows in PyTorch," Zenodo, version v0.14, 2020. DOI: 10.5281/zenodo.4296287.
+[21] <a id="durkan2020nflows"></a> C. Durkan, A. Bekasov, I. Murray, and G. Papamakarios, "nflows: normalizing flows in PyTorch," *Zenodo*, version v0.14, 2020. DOI: 10.5281/zenodo.4296287.
 
 [22] <a id="dauphin2017gatedconv"></a> Y. N. Dauphin, A. Fan, M. Auli, and D. Grangier, "Language Modeling with Gated Convolutional Networks," in *Proceedings of the 34th International Conference on Machine Learning (ICML 2017)*, PMLR, pp. 933-941, 2017.
 
-[23] <a id="vaswani2017attention"></a> A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, "Attention is All You Need," in Advances in Neural Information Processing Systems (NeurIPS 2017), vol. 30, 2017.
+[23] <a id="vaswani2017attention"></a> A. Vaswani, N. Shazeer, N. Parmar, J. Uszkoreit, L. Jones, A. N. Gomez, Ł. Kaiser, and I. Polosukhin, "Attention is All You Need," in *Advances in Neural Information Processing Systems (NeurIPS 2017)*, vol. 30, 2017.
 
-[24] <a id="zhang2019rmsnorm"></a> B. Zhang and R. Sennrich, "Root Mean Square Layer Normalization," in Advances in Neural Information Processing Systems (NeurIPS 2019), vol. 32, 2019.
+[24] <a id="zhang2019rmsnorm"></a> B. Zhang and R. Sennrich, "Root Mean Square Layer Normalization," in *Advances in Neural Information Processing Systems (NeurIPS 2019)*, vol. 32, 2019.
 
-[25] <a id="henry2020query"></a> A. Henry, P. R. Dachapally, S. S. Pawar, and Y. Chen, "Query-Key Normalization for Transformers," in Findings of the Association for Computational Linguistics: EMNLP 2020, pp. 4246-4253, 2020.
+[25] <a id="henry2020query"></a> A. Henry, P. R. Dachapally, S. S. Pawar, and Y. Chen, "Query-Key Normalization for Transformers," in *Findings of the Association for Computational Linguistics: EMNLP 2020*, pp. 4246-4253, 2020.
 
-[26] <a id="shazeer2020glu"></a> N. Shazeer, "GLU Variants Improve Transformer," arXiv preprint arXiv:2002.05202, 2020.
+[26] <a id="shazeer2020glu"></a> N. Shazeer, "GLU Variants Improve Transformer," *arXiv preprint* arXiv:2002.05202, 2020.
 
 [27] <a id="wildberger2023flowmatching"></a> J. B. Wildberger, M. Dax, S. Buchholz, S. R. Green, J. H. Macke, and B. Schoelkopf, "Flow Matching for Scalable Simulation-Based Inference," in *Proceedings of the 37th Conference on Neural Information Processing Systems (NeurIPS 2023)*, 2023.
+
+[28] <a id="wang2024rectified"></a> F.-Y. Wang, L. Yang, Z. Huang, M. Wang, and H. Li, "Rectified Diffusion: Straightness Is Not Your Need in Rectified Flow," *arXiv preprint* arXiv:2410.07303, 2024.
+
+[29] <a id="yang2024consistency"></a> L. Yang, Z. Zhang, Z. Zhang, X. Liu, M. Xu, W. Zhang, C. Meng, S. Ermon, and B. Cui, "Consistency Flow Matching: Defining Straight Flows with Velocity Consistency," *arXiv preprint* arXiv:2407.02398, 2024.
+
+[30] <a id="sabour2025alignflow"></a> A. Sabour, S. Fidler, and K. Kreis, "Align Your Flow: Scaling Continuous-Time Flow Map Distillation," *arXiv preprint* arXiv:2506.14603, 2025.
+
+[31] <a id="kim2025simplereflow"></a> B. Kim, Y.-G. Hsieh, M. Klein, M. Cuturi, J. C. Ye, B. Kawar, and J. Thornton, "Simple ReFlow: Improved Techniques for Fast Flow Models," in *Proceedings of the Thirteenth International Conference on Learning Representations (ICLR 2025)*, 2025.
+
+[32] <a id="su2025highorder"></a> M. Su, J. Y.-C. Hu, Y.-C. Lee, N. Zhu, J.-H. Chung, S. Wu, Z. Song, M. Chen, and H. Liu, "High-Order Flow Matching: Unified Framework and Sharp Statistical Rates," in *Proceedings of the Thirty-Ninth Annual Conference on Neural Information Processing Systems (NeurIPS 2025)*, 2025.
+
+[33] <a id="zhang2025hierarchical"></a> Y. Zhang, Y. Yan, A. Schwing, and Z. Zhao, "Towards Hierarchical Rectified Flow," in *Proceedings of the Thirteenth International Conference on Learning Representations (ICLR 2025)*, 2025.
+
+[34] <a id="guo2025variational"></a> P. Guo and A. G. Schwing, "Variational Rectified Flow Matching," *arXiv preprint* arXiv:2502.09616, 2025.
+
+[35] <a id="boffi2024flowmap"></a> N. M. Boffi, M. S. Albergo, and E. Vanden-Eijnden, "Flow Map Matching," *arXiv preprint* arXiv:2406.07507, 2024.
+
+
+
+
+
 
 
 ## 📚 Quick Links
