@@ -24,36 +24,93 @@ The FMPE-based retrieval framework is built upon Conditional Flow Matching (CFM;
 Here, we consider the simplest conditional path that is given by the CondOT (or equivalently OT-CFM), based on the optimal transport theory which couples samples between the base and data distributions using a linear interpolation, thus easily providing a closed-form solution of the target conditional vector field.  
 FMPE enables the application of CNFs trained with CFM to simulation-based inference (and hence, atmospheric retrieval) just using the Bayes' theorem (see [[11](@gebhard2024flowmatching-atmospheres), [12](@giordanoorsini2025flowmatching)] for additional details).
 
+The training of CNFs with the FMPE paradigm is driven by the minimization of the FMPE loss (see Equation 7 in [[27](@wildberger2023flowmatching)]).
+
+To infer the posterior distribution of atmospheric parameters, we solve the underlying ODE governing the trasport dynamics in the case of FMPE through multiple NFEs of the trained CNF (see Equation 2 in [[27](@wildberger2023flowmatching)]).
+
+### Implementation of the FMPE-based retrieval framework
+
 The FMPE-based retrieval framework is designed to handle heterogeneous data, separately, by incorporating dedicated neural modules.
 
-<!-- ![Overview of the FMPE framework.](./images/FMPE_diagram.png) !-->
 
 Here we describe its constituent modules:
-* **Context Embedding Network.** It compresses the spectral context (i.e., the perturbed transmission spectrum, the original wavelength-dependent spectral uncertainties, and the wavelengths) to a lower-dimensional representation. This module can be parameterized either as a Dense Residual Network or as a Multi-Scale Transformer, as detailed below. Beyond architectural differences, the key distinction between these parameterizations lies in how the inputs are combined: the Dense Residual Network concatenates the individual components sequentially, forming a single high-dimensional vector, whereas the Multi-Scale Transformer organizes them along the channel dimension, preserving alignment across wavelength bins. In the former case, we consider a shallow Dense Residual Network, consisting of just 2 blocks, each producing an hidden representation of size 512. Each block uses Layer Normalization [[16](@ba2016layernorm)], GELU activation function [[17](@hendrycks2016gelu)], and dropout regularization [[18](@srivastava2014dropout)] set to 0.1.
-
-* **Auxiliary Data Embedding Network.** It maps planetary system–related information (not directly contained in the spectral context) into a higher-dimensional latent representation, thereby enriching the conditioning information available to the model and allowing the model to exploit correlations between system-level properties and spectral features. This module is parameterized by a shallow Dense Residual Network, identical to the context embedding network.
-
-* **Timestep and Atmospheric Parameters Embedding Network.** It embeds the time-interpolated atmospheric parameters produced by the FMPE framework, together with the associated continuous timestep, into a higher-dimensional latent representation. To explicitly encode temporal information, a sine–cosine positional encoding is first applied to the timestep. The resulting encoding is then concatenated with the atmospheric parameter vector and processed by a shallow Dense Residual Network, identical to the context embedding network.
-
-* **Continuous Normalizing Flow.** This is meant as the "vector field network", which takes the embedded context and embedded timestep and atmospheric parameters combined with a gated linear unit (GLU; [[22](@dauphin2017gatedconv)]) and is parameterized by a 14-layer Dense Residual Network, with layer sizes decreasing from 2048 to 6 (i.e., the number of atmospheric parameters) to predict the vector field inducing the probability density transport between the base distribution (standard normal) and the data distribution.
+* **Context Embedding Network.** It compresses the spectral context (i.e., the perturbed transmission spectrum, the original wavelength-dependent spectral uncertainties, and the wavelengths) to a lower-dimensional representation. This module can be parameterized either as a Dense Residual Network or as a Multi-Scale Transformer, as detailed below. Beyond architectural differences, the key distinction between these parameterizations lies in how the inputs are combined: the Dense Residual Network concatenates the individual components sequentially, forming a single high-dimensional vector, whereas the Multi-Scale Transformer organizes them along the channel dimension, preserving alignment across wavelength bins. 
 
 
+
+* **Auxiliary Data Embedding Network.** It maps planetary system–related information (not directly contained in the spectral context) into a higher-dimensional latent representation, thereby enriching the conditioning information available to the model and allowing the model to exploit correlations between system-level properties and spectral features. 
+
+
+* **Timestep and Atmospheric Parameters Embedding Network.** It embeds the time-interpolated atmospheric parameters produced by the FMPE framework, together with the associated continuous timestep, into a higher-dimensional latent representation. To explicitly encode temporal information, a sine–cosine positional encoding is first applied to the timestep. The resulting encoding is then concatenated with the atmospheric parameter vector.
+
+* **Continuous Normalizing Flow.** This is meant as the "vector field network" and is parameterized by a 14-layer Dense Residual Network, with layer sizes decreasing from 2048 to 6 (i.e., the number of atmospheric parameters) to predict the vector field inducing the probability density transport between the base distribution (standard normal) and the data distribution. As showed previously, GLUs are employed to condition the prediction of the vector field using auxiliary data and the timestep-atmospheric parameters pair of data.
+
+
+In the following sections, we will describe the architecture of the two neural networks involved in this work: Dense Residual Network and Multi-Scale Transformer. 
+
+#### Dense Residual Network
+
+A Dense Residual Network is composed of a sequence of dense residual blocks, each including Layer Normalization [[16](@ba2016layernorm)], GELU activation function [[17](@hendrycks2016gelu)], and dropout regularization [[18](@srivastava2014dropout)]. Here we provide a visual illustration of the Dense Residual Network implementing a CNF, where larger rectangles indicates larger number of parameters. 
+
+
+![Overview of a Dense Residual Network](./images/dense_residual_block.png)
+
+The first dense residual block processes the embeddings of the spectral context, of auxiliary data, of timestep and atmospheric parameters, jointly, while the last block outputs the predicted vector field.
+
+In this case, the feature extraction process is mainly driven by the embedding of the spectral context, where most of the computation happens, while the rest of the embeddings are used as conditioning information. For this aim, linear layers are used to match embedding dimensions. 
+To condition the embedding of the spectral context, GLUs [[22](@dauphin2017gatedconv)] on the spectral context are employed. 
+In contrast to our prior work [[12](@giordanoorsini2025flowmatching)], we introduce two GLUs: the former acts on the auxiliary data, while the latter on the timestep-atmospheric parameters pair.
+
+The residual (or skip) connection mitigate vanishing gradients in deeper configurations, enabling scalable and expressive transformations for density estimation. The intermediate output of each block is then passed as input to the next block of the dense residual network until the predicted vector field is obtained.
 
 ### Multi-Scale Transformer Embedding Network
 
-To capture long-range dependencies and multi-resolution structure in the spectral data, the MST-FMPE introduces a Multi-Scale Transformer Encoder as a context embedding network, which takes the spectral context as input and operates on overlapping patches at multiple spectral resolutions. The architecture is designed to jointly model local fine-grained patterns and global contextual information through hierarchical attention and cross-scale information exchange.
+To capture long-range dependencies and multi-resolution structure in the spectral data, we introduce a Multi-Scale Transformer Encoder as a context embedding network, which takes the spectral context as input and operates on overlapping patches at multiple spectral resolutions. The architecture is designed to jointly model local fine-grained patterns and global contextual information through hierarchical attention and cross-scale information exchange.
 
-* **Multi-Scale Patch Embedding.** To construct multi-scale representations, the spectral context is decomposed into overlapping patches at four distinct scales, defined by patch sizes {2048, 4096, 8192, 16384} and corresponding strides {256, 512, 1024, 2048}.
-At each scale, patches are linearly projected into a shared embedding space of dimension 128, producing a sequence of tokens. Smaller patch sizes emphasize local structure with high overlap, while larger patches provide increasingly global context with coarser resolution.
+* **Multi-Scale Patch Embedding.** To construct multi-scale representations, the spectral context is decomposed into overlapping patches at multiple scales.
+At each scale, patches are linearly projected into a shared embedding space, producing a sequence of tokens. Smaller patch sizes emphasize local structure with high overlap, while larger patches provide increasingly global context with coarser resolution.
 
-* **Token and Positional Encoding.** We point that the wavelengths naturally encode the positional information of each token and patch. Therefore, we exploit this by simply adding the wavelengths to each token and by adopting a wavelength-based patch-level positional encoding. In particular, we take the median wavelength of each patch, divide out by the minimum of the median wavelengths and transform the resulting vector in log space. Then, we add the obtained positional vector to the patches.
+* **Token and Positional Encoding.** We point that the wavelengths naturally encode the positional information of each token and patch. Therefore, we exploit this by simply adding the wavelengths to each token and by adopting a wavelength-based patch-level positional encoding. 
 
-* **Transformer Blocks.** At each scale, the embedded tokens are processed by a stack of Transformer layers [[23](@vaswani2017attention)], with two layers per scale. Each layer follows a pre-normalization and post-normalization scheme using RMS normalization [[24](@zhang2019rmsnorm)], improving numerical stability and training robustness. Self-attention is implemented via multi-head self-attention (MHSA) with 4 heads, using a classic attention formulation. Query–key normalization [[25](@henry2020query)] is applied to stabilize attention scores, while the attention scaling factor is fixed rather than learned. The feed-forward network (FFN) within each Transformer block adopts a SwiGLU activation [[26](@shazeer2020glu)], with the hidden dimension expanded by a factor of four relative to the model dimension. Dropout regularization set to 0.1 is applied within the FFN to mitigate overfitting.
+* **Transformer Blocks.** At each scale, the embedded tokens are processed by a stack of Transformer layers [[23](@vaswani2017attention)], which can be repeated for each scale. Each layer follows a pre-normalization and post-normalization scheme using RMS normalization [[24](@zhang2019rmsnorm)], improving numerical stability and training robustness. Self-attention is implemented via multi-head self-attention (MHSA), using a classic attention formulation. Query–key normalization [[25](@henry2020query)] is applied to stabilize attention scores. The feed-forward network (FFN) within each Transformer block adopts a SwiGLU activation [[26](@shazeer2020glu)] and dropout regularization [[18](@srivastava2014dropout)] to mitigate overfitting.
 
 * **Cross-Scale Fusion.** To integrate information across resolutions, the architecture employs incremental cross-attention between scales. Representations at finer scales attend to coarser-scale representations through multi-head cross-attention (MHCA), allowing local features to be contextualized by global structure. This progressive fusion strategy ensures that information flows coherently across scales while mantaining a compact latent representation.
 
 
+An overview of the Multi-Scale Transformer is presented in the following figure.
+
+![Overview of the Multi-Scale Transformer Embedding Network.](./images/multi_scale_transformer.png)
+
+### Multi-Scale Transformer-FMPE (MST-FMPE)
+
+The MST-FMPE model uses 4 scales, defined by patch sizes {2048, 4096, 8192, 16384} and corresponding strides {256, 512, 1024, 2048}.
+Patches are linearly projected into a shared embedding space of dimension 128.
+
+To implement a wavelength-aware patch-level positional encoding, we take the median wavelength of each patch, divide out by the minimum of the median wavelength per patch and apply a log transformation. Then, we add the obtained positional vector to the patches.
+
+The Transformer is composed of two blocks per scale, each using MHSA with 4 heads and fixed attention scaling factor, while the SwiGLU FFN employs an expansion factor set to 4.0 relative to the model dimension (128), dropout regularization set to 0.1.
+The Auxiliary Data Embedding Network and the Timestep and Atmospheric Parameters Embedding Network consists of a shallow Dense Residual Network, with just 2 blocks, each producing an hidden representation of size 512 and dropout regularization set to 0.1.
+Cross-scale fusion is done by using MHCA with 4 heads.
+
+An simple, schematic overview of the MST-FMPE framework is presented in the following figure.
+
+![Overview of the MST-FMPE framework.](./images/MST_FMPE_diagram.png)
+
 ## Experimental Setup
+
+### Research Questions 
+Within this context, our experiments are driven by the following research questions:
+
+#### 1. Is FMPE Still the State-of-the-art in High-resolution Settings?
+> High-resolution spectra introduce both opportunities (more detailed molecular signatures) and challenges (larger input dimensions, higher noise sensitivity). While FMPE has demonstrated state-of-the-art results in medium-resolution settings [[11](@gebhard2024flowmatching-atmospheres), [12](@giordanoorsini2025flowmatching)], its scalability and reliability at high-resolution spectra need systematic evaluation, especially considering the dimensionality increase and computational complexity. 
+
+#### 2. Are Transformers Better Encoders for High-resolution Spectral Data?
+> High-resolution transmission spectra contain extremely long sequences (102,400 dimensions per spectrum). Traditional encoders in this context, such as Dense Residual Networks, may struggle with the high dimensionality of the spectra and long-range dependencies between spectral lines. Transformers are designed for sequence modeling and may simultaneously handle very high-dimensional spectra and capture the above-mentioned dependencies more effectively.
+
+#### 3. Are Auxiliary Data Beneficial in High-resolution Retrieval?
+> Auxiliary data (stellar and planetary parameters) provide contextual information that may complement the spectral input. We already proved their effectiveness in a prior work [[12](@giordanoorsini2025flowmatching)]. At high resolution, the potential of auxiliary data is still unknown.
+
+The following sections will describe the dataset, training and inference procedures, the posterior evaluation framework, and the neural competitors involved in the comparative analysis.
 
 ### Dataset 
 <a href="dataset">
@@ -75,6 +132,7 @@ Due to the very narrow observed transit depth range (1e-5 - 1e-2), trasmission s
 As required by the flow matching paradigm, target atmospheric parameters and auxiliary data are preprocessed using feature-wise Z-score normalization according to the mean and standard deviation computed on samples of the training set.
 Finally, we naturally perform online data augmentation by perturbing each transmission spectrum with scaled Gaussian noise having zero mean and variance given by the square of the associated spectral uncertainties. The scaling factor is bounded in [0.05, 0.5].
 
+
 ### Training Phase
 
 The training phase of all the experiments is executed on a single GPU.
@@ -85,6 +143,7 @@ Furthermore, we enable automatic mixed precision to save memory during forward a
 
 
 ### Inference Phase
+
 The sampling phase of all the experiments is conducted in a multi-GPU fashion using 4 devices simultaneously. The number of realizations of the posterior distribution given each observed spectrum is set to 2048. Therefore, according to the size of the test set described in [Dataset](#dataset), the total number of generated samples is 18,718,720.
 
 We define a unique sampling setup for all the experiments, in which we adopt a batch size of 4 and a chunk size of 64. 
@@ -99,34 +158,28 @@ To assess the performance of heterogeneous posterior estimators, we established 
 We recall that all of these predictive aspects provide precious information about the quality of the predicted posterior distributions but to check whether the inference is correct, the analysis should be complemented with posterior predictive checks (PPCs; [[13](@cook2006validation), [14](@gelman2013bayesian)]). These checks involve the comparison between the distribution of the original simulated observations with the posterior predictive distribution obtained by passing the set of posterior samples as input to the simulator. 
 Due to the slow sampling speed of our simulator, PPCs cannot be performed in a reasonable amount of time, even considering the modest size of the designed test set.
 
-We perform a comparative analysis including our method, the FMPE baseline, and NPE. We plan to extend the comparison to traditional Bayesian inference methods, such as DE-MCMC [[15](@sherri2017differential)], on a very limited subset of the test set, due to their significant computational cost.
-
-Within this context, our experiments are driven by the following research questions:
-
-#### 1. Is FMPE Still the State-of-the-art in High-resolution Settings?
-> High-resolution spectra introduce both opportunities (more detailed molecular signatures) and challenges (larger input dimensions, higher noise sensitivity). While FMPE has demonstrated state-of-the-art results in medium-resolution settings [[11](@gebhard2024flowmatching-atmospheres), [12](@giordanoorsini2025flowmatching)], its scalability and reliability at high-resolution spectra need systematic evaluation, especially considering the dimensionality increase and computational complexity. 
-
-#### 2. Are Transformers Better Encoders for High-resolution Spectral Data?
-> High-resolution transmission spectra contain extremely long sequences (102,400 dimensions per spectrum). Traditional encoders in this context, such as Dense Residual Networks, may struggle with the high dimensionality of the spectra and long-range dependencies between spectral lines. Transformers are designed for sequence modeling and may simultaneously handle very high-dimensional spectra and capture the above-mentioned dependencies more effectively.
-
-#### 3. Are Auxiliary Data Beneficial in High-resolution Retrieval?
-> Auxiliary data (stellar and planetary parameters) provide contextual information that may complement the spectral input. We already proved their effectiveness in a prior work [[12](@giordanoorsini2025flowmatching)]. At high resolution, the potential of auxiliary data is still unknown.
-
 
 ### Competitors
 
-We compared the performance of MST-FMPE against two baselines: Neural Posterior Estimation (NPE) and a basic variant of FMPE, which uses Dense Residual Networks to parameterize each module. 
+We perform a comparative analysis including: (i) our FMPE-based retrieval framework leveraging the Multi-Scale Transformer as context embedding entwork (denoted with MST-FMPE); (ii) the FMPE baseline, which uses Dense Residual Networks to parameterize each module; (iii) Neural Posterior Estimation (NPE), which has been the state of the art before FMPE. 
+We plan to extend the comparison to traditional Bayesian inference methods, such as DE-MCMC [[15](@sherri2017differential)], on a very limited subset of the test set, due to their significant computational cost.
 
-**NPE Model.** NPE involves the training of a conditional density estimator which describes the transformation of a probability density (e.g., a standard normal) through a sequence of invertible mappings. Following the implementation provided by the authors in [[11](@gebhard2024flowmatching-atmospheres)], the NPE model consists of two parts:
-* **Context Embedding Network.** This module is parameterized by a shallow Dense Residual Network, identical to the context embedding network of the baseline FMPE model.
+#### FMPE Model
+The FMPE model uses the same configuration to parameterize the Context Embedding Network and the Timestep and Atmospheric Parameters Embedding Network, that consists of a shallow Dense Residual Network, with just 2 blocks, each producing an hidden representation of size 512. In all cases, dropout regularization is set to 0.1.
 
-* **Discrete Normalizing Flow.** We use a neural spline flow (NSF; [[19](@durkan2019neuralsplineflows)]) as implemented by the ```glasflow``` library [[20](@williams2024glasflow)], which is itself based on ```nflows``` [[21](@durkan2020nflows)]. The conditional NSF takes the embedded context as input and consists of 16 steps, each consisting of 4 blocks with 512 units, GELU activation functions [[17](@hendrycks2016gelu)], and dropout regularization [[18](@srivastava2014dropout)] set to 0.1. The number of bins for the splines is 16.
+A schematic overview of the baseline FMPE framework is presented in the following figure.
 
+![Overview of the FMPE framework.](./images/FMPE_diagram.png) 
+
+
+#### NPE Model
+NPE involves the training of a conditional density estimator which describes the transformation of a probability density (e.g., a standard normal) through a sequence of invertible mappings. Following the implementation provided by the authors in [[11](@gebhard2024flowmatching-atmospheres)], the NPE model consists of two parts: (i) a **Context Embedding Network**, parameterized by a shallow Dense Residual Network, identical to the context embedding network of the baseline FMPE model; and (ii) a **Discrete Normalizing Flow**. We use a neural spline flow (NSF; [[19](@durkan2019neuralsplineflows)]) as implemented by the ```glasflow``` library [[20](@williams2024glasflow)], which is itself based on ```nflows``` [[21](@durkan2020nflows)]. The conditional NSF takes the embedded context as input and consists of 16 steps, each consisting of 4 blocks with 512 units, GELU activation functions [[17](@hendrycks2016gelu)], and dropout regularization [[18](@srivastava2014dropout)] set to 0.1. The number of bins for the splines is 16.
 This configuration is designed to match approximatively the number of parameters of the FMPE-based model. 
-
 The NPE models is trained using maximum likelihood estimation (MLE), as Discrete Normalizing Flows are able to compute directly the likelihood of the samples using the change-of-variable formula.
 
-<!-- ![NPE](./images/NPE_diagram.png) !-->
+A visual illustration of the NPE framework is presented in the following figure.
+
+![Overview of the NPE framework.](./images/NPE_diagram.png)
 
 
 ## Results and Discussion
@@ -229,15 +282,16 @@ NPE produces posterior distributions that are far closer to the true reference d
 Flow matching-based methods, while designed to capture complex and flexible posterior shapes, show much higher discrepancies from the ground-truth distributions, suggesting that their posterior samples may slightly diverge in certain regions of the parameter space. 
 
 ### Effectiveness of Auxiliary Data in MST-FMPE
-Here we address the third research question, which is about the effectiveness of auxiliary data within the proposed retrieval framework.
+Here we address the third research question presented in [](#third_research_question) , which is about the effectiveness of auxiliary data within the proposed retrieval framework. 
+
 
 
 | **Regression Error Metric**                     | **MST-FMPE**  | **MST-FMPE w/ Aux. Data** |
 | ------------------------------ | ------------- | ------------------------- |
 | MSE                        | 3.345 ± 2.876 | 3.364 ± 2.893             |
-| MAE                        | 1.375 ± 0.735 | 1.367 ± 0.753             |
-| MedAE                      | 1.323 ± 0.744 | 1.321 ± 0.752             |
-| RMSE                       | 1.612 ± 0.851 | 1.602 ± 0.882             |
+| MAE                        | 1.375 ± 0.735 | **1.367 ± 0.753**             |
+| MedAE                      | 1.323 ± 0.744 | **1.321 ± 0.752**             |
+| RMSE                       | 1.612 ± 0.851 | **1.602 ± 0.882**             |
 
 In terms of predictive accuracy, improvements are minor and inconsistent, suggesting that auxiliary data slightly improves median errors but does not substantially affect overall regression performance.
 
@@ -246,9 +300,9 @@ In terms of predictive accuracy, improvements are minor and inconsistent, sugges
 | ------------------------------ | ------------- | ------------------------- |
 | NLL                        | 8.921 ± 1.497 | 24.497 ± 30.547           |
 | QCE                        | 0.178 ± 0.081 | 0.406 ± 0.189             |
-| PL | 0.207 ± 0.172 | 0.217 ± 0.183             |
+| PL                         | 0.207 ± 0.172 | 0.217 ± 0.183             |
 | ENCE                       | 0.175 ± 0.107 | 1.467 ± 0.807             |
-| UCE                        | 0.466 ± 0.326 | **0.452 ± 0.375**             |
+| UCE                        | 0.466 ± 0.326 | **0.452 ± 0.375**         |
 | Sharpness                  | 1.369         | 1.392                     |
 
 
@@ -277,7 +331,7 @@ In terms of distribution discrepancy measures, both metrics improve slightly wit
 
 ### Challenges of FMPE-based Retrieval Frameworks in High-Resolution Settings
 A central practical limitation in this study stems from the numerical ODE integration during sampling with CNFs. While adaptive solvers such as ```dopri5``` are commonly used in CNF-based models, their computational cost scales rapidly with NFEs, rendering them prohibitive in high-dimensional settings. As a result, we can rely either on relaxed absolute and relative tolerances for adaptive solvers or on fixed-step solvers (e.g., ```rk4```) with a small number of integration steps. Here we adopt the second option. 
-Nevertheless, both choices introduce approximation errors in the trasport dynamics, potentially hindering performance of FMPE-based retrieval framework, and specifically, of the proposed contribution.
+Nevertheless, both choices introduce approximation errors in the trasport dynamics, potentially hindering performance of FMPE-based retrieval frameworks, and specifically, of the proposed contribution.
 Recent approaches aim at straightening the flow or avoiding explicit ODE simulation—such as rectified flows, high-order flow matching, or flow map matching—represent promising directions to alleviate this limitation and may be necessary to fully exploit richer context embeddings.
 
 
@@ -285,9 +339,9 @@ Recent approaches aim at straightening the flow or avoiding explicit ODE simulat
 
 High-resolution atmospheric retrieval of exoplanets remains a relatively under-explored problem in astrophysics and planetary science, owing to the strongly non-linear nature of the underlying physics and chemistry, the ill-posedness of the inverse problem, and the severe computational challenges induced by the high dimensionality of spectroscopic observations.
 
-To address these challenges, we introduced MST-FMPE, a novel FMPE-based retrieval framework that leverages recent advances in neural architectures, such as Transformers, to process high-resolution spectral data in a multi-scale fashion to infer the joint posterior distribution of atmospheric parameters. To support this study, we constructed a dedicated simulated dataset comprising high-resolution spectra, planetary system–level auxiliary information, and atmospheric parameters governing the observations. 
+To address these challenges, we introduce MST-FMPE, a novel FMPE-based retrieval framework that leverages recent advances in neural architectures, such as Transformers, to process high-resolution spectral data in a multi-scale fashion to infer the joint posterior distribution of atmospheric parameters. To support this study, we construct a dedicated simulated dataset comprising high-resolution spectra, planetary system–level auxiliary information, and atmospheric parameters governing the observations. 
 
-Using a comprehensive set of posterior evaluation metrics that probe complementary aspects of predictive performance, we observed clear trade-offs between accuracy, computational efficiency, and posterior quality. 
+Using a comprehensive set of posterior evaluation metrics that probe complementary aspects of predictive performance, we observe clear trade-offs between accuracy, computational efficiency, and posterior quality. 
 While MST-FMPE and FMPE achieve lower regression errors than NPE, these gains in pointwise accuracy do not translate into improved uncertainty quantification. NPE consistently produces better-calibrated and more reliable posteriors, with higher coverage and closer agreement with reference distributions, whereas FMPE-based methods exhibit mild overconfidence and larger distributional discrepancies. Although MST-FMPE reduces the number of trainable parameters, its multi-scale Transformer architecture incurs substantially higher computational cost and longer sampling times. 
 
 A key limiting factor for both FMPE and MST-FMPE is the reliance on few-fixed-step ODE solvers during sampling, which constrains the accuracy of the ODE trajectory and likely obscures the potential benefits of our contributions, as well as, of the FMPE approach, in general.
@@ -370,6 +424,8 @@ Data used in these experiments are available on request.
 [25] <a id="henry2020query"></a> A. Henry, P. R. Dachapally, S. S. Pawar, and Y. Chen, "Query-Key Normalization for Transformers," in Findings of the Association for Computational Linguistics: EMNLP 2020, pp. 4246-4253, 2020.
 
 [26] <a id="shazeer2020glu"></a> N. Shazeer, "GLU Variants Improve Transformer," arXiv preprint arXiv:2002.05202, 2020.
+
+[27] <a id="wildberger2023flowmatching"></a> J. B. Wildberger, M. Dax, S. Buchholz, S. R. Green, J. H. Macke, and B. Schoelkopf, "Flow Matching for Scalable Simulation-Based Inference," in *Proceedings of the 37th Conference on Neural Information Processing Systems (NeurIPS 2023)*, 2023.
 
 
 ## 📚 Quick Links
