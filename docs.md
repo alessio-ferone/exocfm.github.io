@@ -92,7 +92,7 @@ The Transformer is composed of two blocks per scale, each using MHSA with 4 head
 The Auxiliary Data Embedding Network and the Timestep and Atmospheric Parameters Embedding Network consists of a shallow Dense Residual Network, with just 2 blocks, each producing an hidden representation of size 512 and dropout regularization set to 0.1.
 Cross-scale fusion is done by using MHCA with 4 heads.
 
-An simple, schematic overview of the MST-FMPE framework is presented in the following figure.
+A simple, schematic overview of the MST-FMPE framework is presented in the following figure.
 
 ![Overview of the MST-FMPE framework.](./images/MST_FMPE_diagram.png)
 
