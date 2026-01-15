@@ -209,7 +209,7 @@ Lower values indicate better predictive accuracy.
 
 | **Method** | **MSE** | **MAE** | **MedAE** | **RMSE** |
 |------|------|------|-----|------|
-| NPE  | 3.812 ± 3.062 | 1.457 ± 0.746 | 1.387 ± 0.739   | 1.735 ± 0.885  |
+| NPE  | 3.798 ± 3.342 | 1.453 ± 0.815 | 1.731 ± 0.969 | 1.375 ± 0.796 | 
 | FMPE  | 3.357 ± 2.875 | 1.376 ± 0.729 | 1.325 ± 0.737  | 1.618 ± 0.848  |
 | MST-FMPE  | **3.345 ± 2.876** | **1.375 ± 0.735** | **1.323 ± 0.744** | **1.612 ± 0.851** |
 
@@ -229,12 +229,12 @@ The following table reports the measurements of the above-mentioned metrics. All
 
 |**Method**|**NLL**|**QCE**| **PL** |**ENCE**|**UCE**| **Sharpness**
 |------|------|------|------|------|------|------|
-| NPE  | **8.814 ± 1.251** | **0.068 ± 0.036** | **0.197 ± 0.152** | **0.089 ± 0.151** | **0.083 ± 0.403** | 1.826 |
-| FMPE            | 8.907 ± 1.475 | 0.167 ± 0.079 | 0.206 ± 0.171 | 0.160 ± 0.101 | 0.448 ± 0.295 | 1.388 | 
-| MST-FMPE | 8.921 ± 1.497 | 0.178 ± 0.081 | 0.207 ± 0.172 | 0.175 ± 0.107 | 0.466 ± 0.326 | **1.369** |
+| NPE | **1.466 ± 0.491** | **0.067 ± 0.033** | **0.197 ± 0.152** | **0.071 ± 0.093** | **0.059 ± 0.302** | 1.825 ± 0.037 |
+| FMPE | 1.483 ± 0.599 | 0.167 ± 0.079 | 0.207 ± 0.171 | 0.161 ± 0.101 | 0.449 ± 0.295 | 1.388 ± 0.022 |
+| MST-FMPE | 1.486 ± 0.609 | 0.178 ± 0.082 | 0.207 ± 0.172 | 0.175 ± 0.108 | 0.466 ± 0.326 | **1.369 ± 0.022** |
 
 
-<!-- | MST-FMPE w/ aux. data | 24.497 ± 30.547 | 0.406 ± 0.189 | 0.217 ± 0.183 | 1.467 ± 0.807 | 0.452 ± 0.375 | 1.392 | !-->
+<!-- | MST-FMPE w/ aux. data | 4.048 ± 5.508 | 0.406 ± 0.190 | 0.217 ± 0.183 | 1.468 ± 0.807 | 0.452 ± 0.376 | 1.391 ± 0.024 | -->
 
 
 NPE produces the most well-calibrated posterior distributions, with predicted uncertainties closely reflecting the actual errors. Its higher Sharpness value also suggests that NPE-based uncertainty estimates are more dispersed, consistent with a conservative approach. FMPE and MST-FMPE, while potentially more flexible in representing complex posterior shapes, show higher calibration errors and lower Sharpness, indicating slightly under-dispersed or overconfident predictions.
@@ -252,9 +252,10 @@ The following table reports the posterior coverage performance at the 68% (1σ),
 | **Method** | | | **MCR** | | | | **JCR** | | 
 |----|----|----|----|----|----|----|----|----|
 | | **68** | **95** | **99** | **S** | **68** | **95** | **99** | **S** |
-| NPE             | **0.589**  | **0.991**  | **0.998**  | **0.995** | **0.041**  | **0.948**  | 0.989  | **0.974** |
+| NPE | **0.589** | **0.991** | **0.998** | **0.999** | **0.042** | **0.947** | 0.989 | **0.998** |
 | FMPE            | 0.531  | 0.978  | **0.998**  | 0.940 | 0.022  | 0.878  | **0.993**  | 0.689 |
 | MST-FMPE  | 0.525  | 0.973  | **0.998**  | 0.952 | 0.020  | 0.853  | **0.993**  | 0.745 |
+
 
 <!-- | MST-FMPE w/ aux. data | 0.439       | 0.869       | 0.893       | 0.770      | 0.005       | 0.262       | 0.364       | 0.178   |  !-->
 
@@ -270,12 +271,11 @@ Lower values of both metrics indicate more similarity between distributions.
 
 | **Method** | **JSD** | **MMD** |
 |-----|-----|-----|
-| NPE                     | **10.92**        | **0.001**        |
-| FMPE                    | 208.47       | 0.058        |
-| MST-FMPE                | 210.66       | 0.060        |
+| NPE        | **15.528 ± 2.530** | **0.001 ± 0.002** |
+| FMPE       | 208.956 ± 2.176 | 0.059 ± 0.001 |
+| MST-FMPE   | 211.167 ± 2.250 | 0.061 ± 0.001 |
 
-
-<!-- | MST-FMPE w/ aux. data  | 208.42       | 0.053        | !-->
+<!-- | MST-FMPE w/ aux. data  |208.829 ± 1.458 | 0.053 ± 0.001 | !-->
 
 NPE produces posterior distributions that are far closer to the true reference distributions compared to FMPE and MST-FMPE, as reflected by both JSD and MMD. 
 Flow matching-based methods, while designed to capture complex and flexible posterior shapes, show much higher discrepancies from the ground-truth distributions, suggesting that their posterior samples may slightly diverge in certain regions of the parameter space. 
